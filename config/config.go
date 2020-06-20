@@ -15,8 +15,8 @@ var (
 
 // Config model
 type Config struct {
-	Token     string `json: Token`
-	BotPrefix string `json: BotPrefix`
+	Token     string `json:"Token"`
+	BotPrefix string `json:"BotPrefix"`
 }
 
 func ReadConfig() error {

@@ -66,11 +66,10 @@ import (
 
 // Duel model
 type Duel struct {
-	Player1 string
-	Player2 string
+	Punisher      string
+	MentionPlayer string
 }
 
-var player1, player2 string = "", ""
 var (
 	duels []Duel
 )
@@ -132,35 +131,9 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	if m.Content == "!fight" {
-		p := m.Author.Username
-		if player1 == "" {
-			_, _ = s.ChannelMessageSend(m.ChannelID, "Need one more dude!")
-			player1 = p
-			return
-		}
-
-		if player1 == p {
-			_, _ = s.ChannelMessageSend(m.ChannelID, "Another!")
-		}
-		if player2 == "" && player1 != p {
-			player2 = p
-			_, _ = s.ChannelMessageSend(m.ChannelID, "Fight: "+player1+" vs "+player2)
-
-			rand1 := rand.Intn(100)
-			rand2 := rand.Intn(100)
-
-			if rand1 > rand2 {
-				_, _ = s.ChannelMessageSend(m.ChannelID, player1+" WIN!")
-			} else {
-				_, _ = s.ChannelMessageSend(m.ChannelID, player2+" WIN!")
-			}
-			player1 = ""
-			player2 = ""
-
-			return
-		}
-
+	if strings.Contains(m.Content, "duel") {
+		msg := InitDuel(m)
+		_, _ = s.ChannelMessageSend(m.ChannelID, msg)
 	}
 	// If the message is "ping" reply with "Pong!"
 	if m.Content == "ping" {
@@ -168,7 +141,82 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 }
 
-func duel(p1 string, p2 string) {
-	newD := Duel{p1, p2}
-	duels = append(duels, newD)
+// command duel <action> [@player]
+func InitDuel(m *discordgo.MessageCreate) string {
+	u := m.Author.Username
+	mentions := m.Mentions
+
+	if strings.Contains(m.Content, "list") {
+		var list string
+		for _, duel := range duels {
+			if duel.MentionPlayer == u {
+				list += duel.Punisher + " "
+				// для меншинов нужен userID <@userId>
+			}
+		}
+		if list == "" {
+			return u + ", тебя не вызывали на дуэль "
+		}
+		return u + ", вот список игроков, которые ожидают твоего ответа: " + list
+	}
+	if strings.Contains(m.Content, "revoke") {
+		// отмена дуэли
+		for duelIndex, duel := range duels {
+			if duel.Punisher == u {
+				mention := duel.MentionPlayer
+				DeleteDuel(duelIndex)
+				// для меншинов нужен userID <@userId>
+				return u + " отменил дуэль с " + mention + "!"
+			}
+		}
+		return u + ", ты никого не вызывал на дуэль!"
+	}
+
+	// дальше уже команды требующие упоминания игрока
+	if len(mentions) == 0 {
+		return "Syntax command is: duel <?action> @mentionPlayer"
+	}
+	mentionU := mentions[0].Username
+	if u == mentionU {
+		return "Решил поиграть сам с собой?"
+	}
+
+	if strings.Contains(m.Content, "accept") {
+		// принятие дуэли
+		for duelIndex, duel := range duels {
+			if duel.MentionPlayer == u {
+				winner := RunDuel(duelIndex)
+				// для меншинов нужен userID <@userId>
+				return u + " принял бой с " + duel.Punisher + "! Победитель: " + winner
+			}
+		}
+		return u + ", " + mentionU + " не вызывал тебя на дуэль!"
+	} else {
+		// вызыв на дуэль
+		for _, duel := range duels {
+			if duel.Punisher == u {
+				return u + ", ты уже вызвал на дуэль " + duel.MentionPlayer + ". Дождись ответа!"
+			}
+		}
+		duels = append(duels, Duel{u, mentionU})
+		return u + " вызвал на дуэль " + mentionU + "!"
+	}
+}
+
+func RunDuel(duelIndex int) string {
+	var winner string
+
+	rand1 := rand.Intn(100)
+	rand2 := rand.Intn(100)
+	if rand1 > rand2 {
+		winner = duels[duelIndex].Punisher
+	} else {
+		winner = duels[duelIndex].MentionPlayer
+	}
+	DeleteDuel(duelIndex)
+	return winner
+}
+
+func DeleteDuel(duelIndex int) {
+	duels = append(duels[:duelIndex], duels[duelIndex+1:]...)
 }
