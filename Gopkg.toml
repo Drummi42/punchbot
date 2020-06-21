@@ -24,6 +24,10 @@
 #   go-tests = true
 #   unused-packages = true
 
+[metadata.heroku]
+    root-package = "github.com/Drummi42/punchbot"
+    go-version = "1.14.4"
+    install = [ "./..." ]
 
 [[constraint]]
   name = "github.com/bwmarrin/discordgo"
