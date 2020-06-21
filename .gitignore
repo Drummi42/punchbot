@@ -15,5 +15,5 @@
 vendor/
 
 #local files
-#config.json
+config.json
 .idea
