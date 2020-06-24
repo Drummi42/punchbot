@@ -2,12 +2,20 @@
 
 
 [[projects]]
-  digest = "1:403fb6156a4890546fbc6f2985adb02127a0e901e45526f0fe45494ca4bae645"
+  digest = "1:7dad0c5476be8a939f3e939d8fc0d14ea899e27363fe0ec111d753312c0011c3"
   name = "github.com/bwmarrin/discordgo"
   packages = ["."]
   pruneopts = "UT"
-  revision = "cead8c70f6d1095cf7798efc223ec364a34dd14e"
-  version = "v0.21.0"
+  revision = "eb3514551b4e8a261f880ea6dae2b7efac9f5ade"
+  version = "v0.21.1"
+
+[[projects]]
+  digest = "1:25ebe6496abb289ef977c081b2d49f56dd97c32db4ca083d37f95923909ced02"
+  name = "github.com/gorilla/mux"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "75dcda0896e109a2a22c9315bca3bb21b87b2ba5"
+  version = "v1.7.4"
 
 [[projects]]
   digest = "1:6d29f02f0f01c627c2be40fb7347669a9ff2aa215cb97747294c1d13ffa74bdd"
@@ -28,7 +36,7 @@
     "salsa20/salsa",
   ]
   pruneopts = "UT"
-  revision = "70a84ac30bf957c7df57edd1935d2081871515e1"
+  revision = "75b288015ac94e66e3d6715fb68a9b41bf046ec2"
 
 [[projects]]
   branch = "master"
@@ -36,11 +44,14 @@
   name = "golang.org/x/sys"
   packages = ["cpu"]
   pruneopts = "UT"
-  revision = "981b61492c3565ea113dc1621ca30ef897df5586"
+  revision = "ed371f2e16b4b305ee99df548828de367527b76b"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  input-imports = ["github.com/bwmarrin/discordgo"]
+  input-imports = [
+    "github.com/bwmarrin/discordgo",
+    "github.com/gorilla/mux",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
