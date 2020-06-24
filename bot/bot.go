@@ -5,7 +5,10 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/drummi42/punchbot/config"
 	"math/rand"
+	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 )
 
 // // Book Struct (Model)
@@ -68,7 +71,6 @@ type Duel struct {
 
 var (
 	duels []Duel
-	bot   *discordgo.Session
 )
 
 func Start() {
@@ -103,10 +105,12 @@ func Start() {
 	}
 
 	fmt.Println("Bot is running.")
-}
 
-func Close() {
-	err := bot.Close()
+	sc := make(chan os.Signal, 1)
+	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
+	<-sc
+	// Cleanly close down the Discord session.
+	err = bot.Close()
 
 	if err != nil {
 		fmt.Println("error closing Discord connection", err)

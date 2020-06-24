@@ -25,15 +25,8 @@ func main() {
 		return
 	}
 
-	bot.Start()
-	log.Fatal(http.ListenAndServe(":"+p, r))
-
-	//sc := make(chan os.Signal, 1)
-	//signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
-	//<-sc
-	//
-	//// Cleanly close down the Discord session.
-	//bot.Close()
+	go bot.Start()
+	go log.Fatal(http.ListenAndServe(":"+p, r))
 }
 
 func botAwake(w http.ResponseWriter, r *http.Request) {
