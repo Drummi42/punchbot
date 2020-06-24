@@ -2,14 +2,10 @@ package bot
 
 import (
 	"fmt"
+	"github.com/bwmarrin/discordgo"
 	"github.com/drummi42/punchbot/config"
 	"math/rand"
-	"os"
-	"os/signal"
 	"strings"
-	"syscall"
-
-	"github.com/bwmarrin/discordgo"
 )
 
 // // Book Struct (Model)
@@ -72,6 +68,7 @@ type Duel struct {
 
 var (
 	duels []Duel
+	bot   *discordgo.Session
 )
 
 func Start() {
@@ -106,13 +103,10 @@ func Start() {
 	}
 
 	fmt.Println("Bot is running.")
+}
 
-	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
-	<-sc
-
-	// Cleanly close down the Discord session.
-	err = bot.Close()
+func Close() {
+	err := bot.Close()
 
 	if err != nil {
 		fmt.Println("error closing Discord connection", err)
@@ -136,7 +130,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		_, _ = s.ChannelMessageSend(m.ChannelID, msg)
 	}
 	// If the message is "ping" reply with "Pong!"
-	if m.Content == "ping" {
+	if m.Content == config.BotPrefix+" ping" {
 		_, _ = s.ChannelMessageSend(m.ChannelID, "Pong!")
 	}
 }
